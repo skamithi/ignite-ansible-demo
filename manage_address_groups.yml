@@ -1,5 +1,18 @@
 ---
 - hosts: all
   gather_facts: no
+  connection: local
+  # The pre_tasks section is only added to check that all
+  # the prereqs to run this playbook work. It is not a required
+  # thing to do. IT IS OPTIONAL but helpful for the demonstration
+  pre_tasks:
+    - include_tasks: preflight_checks.yml
   tasks:
-    - debug: msg="hello world"
+    - name: create address object if it does not exist
+      panos_object:
+        ip_address: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        operation: add
+        addressgroup: "{{ addrgroup }}"
+        static_value: []
