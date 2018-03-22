@@ -1,0 +1,27 @@
+- name: PREFLIGHT - does the pip command exist?
+  block:
+    - name: PREFLIGHT - Checks that the PIP command exists
+      shell: pip --version
+      changed_when: false
+  rescue:
+    - fail: msg="pip is not installed. Run easy_install pip or install PIP via your Linux or Homebrew(MacOS) installer"
+
+- name: PREFLIGHT - checks that dnspytho and pandevice python libraries are installed. Uses PIP
+  pip:
+    name: "{{ item }}"
+  with_items:
+    - dnspython
+    - pandevice
+
+- name: |
+    PREFLIGHT - if using virtualenv setting the correct python interpreter path is
+    important otherwise the panos modules fail. The next two tasks
+    automatically handles the situation so whether you are running virtualenv
+    or not this playbook should just work. assuming you have all the prequisites
+  shell: which python
+  register: which_python
+  changed_when: false
+
+- set_fact:
+    ansible_python_interpreter: "{{ which_python.stdout }}"
+

@@ -2,18 +2,13 @@
 - hosts: all
   gather_facts: no
   connection: local
+  # The pre_tasks section is only added to check that all
+  # the prereqs to run this playbook work. It is not a required
+  # thing to do. IT IS OPTIONAL but helpful for the demonstration
+  pre_tasks:
+    - include_tasks: preflight_checks.yml
   tasks:
-    - name: |
-        if using virtualenv setting the correct python interpreter path is
-        important otherwise the panos modules fail
-      shell: which python
-      register: which_python
-
-    - set_fact:
-        ansible_python_interpreter: "{{ which_python.stdout }}"
-
-
-    - name: create an address object
+    - name: DEMOTASK - create an address object
       panos_object:
         ip_address: "{{ ansible_host }}"
         username: "{{ ansible_user }}"
