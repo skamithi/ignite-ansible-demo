@@ -379,7 +379,7 @@ def main():
         if match:
             match_dict = xmltodict.parse(match.element_str())
             module.exit_json(
-                stdout_lines=json.dumps(match_dict, indent=2),
+                object_details=match_dict,
                 msg='Object matched'
             )
         else:
