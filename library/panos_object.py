@@ -178,7 +178,6 @@ try:
     from pandevice import panorama
     from pandevice import objects
     import xmltodict
-    import json
 
     HAS_LIB = True
 except ImportError:
@@ -283,7 +282,12 @@ def add_object(device, dev_group, new_object):
     return None
 
 
-def check_object_idempotency(curr_object, new_object):
+
+def update_object(device, dev_group, new_object, curr_object):
+    if dev_group:
+        dev_group.add(new_object)
+    else:
+        device.add(new_object)
     _changed = False
     attrlist = ['static_value']
     for _attrname in attrlist:
@@ -294,6 +298,7 @@ def check_object_idempotency(curr_object, new_object):
                                                   set(getattr(curr_object,
                                                               _attrname)))
                 if len(missing_entries) > 0:
+                    new_object.update(_attrname)
                     _changed = True
     return _changed
 
@@ -470,9 +475,8 @@ def main():
                     tag_name=tag_name,
                     color=color
                 )
-                changed = check_object_idempotency(match, new_object)
+                changed = update_object(device, dev_group, new_object, match)
                 if changed:
-                    add_object(device, dev_group, new_object)
                     _msg = "Object '%s' successfully updated" % obj_name
                 else:
                     _msg = "Object '%s' already updated" % obj_name
