@@ -233,7 +233,7 @@ def create_object(**kwargs):
             description=kwargs['description'],
             tag=kwargs['tag_name']
         )
-        if newobject.static_value or newobject.dynamic_value:
+        if newobject.static_value != None or newobject.dynamic_value != None:
             return newobject
         else:
             return False
@@ -295,7 +295,7 @@ def main():
         servicegroup=dict(default=None),
         address=dict(default=None),
         address_type=dict(default='ip-netmask', choices=['ip-netmask', 'ip-range', 'fqdn']),
-        static_value=dict(type='list', default=None),
+        static_value=dict(type='list', default=None) ,
         dynamic_value=dict(default=None),
         protocol=dict(default=None, choices=['tcp', 'udp']),
         source_port=dict(default=None),
@@ -424,7 +424,11 @@ def main():
                     tag_name=tag_name,
                     color=color
                 )
-                changed = add_object(device, dev_group, new_object)
+                if new_object is False:
+                    _msg = "Object \'%s\' was not created"  % obj_name
+                    module.fail_json(msg=_msg)
+                else:
+                    changed = add_object(device, dev_group, new_object)
             except PanXapiError:
                 exc = get_exception()
                 module.fail_json(msg=exc.message)
