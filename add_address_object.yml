@@ -1,5 +1,24 @@
 ---
 - hosts: all
   gather_facts: no
+  connection: local
   tasks:
-    - debug: msg="hello world"
+    - name: |
+        if using virtualenv setting the correct python interpreter path is
+        important otherwise the panos modules fail
+      shell: which python
+      register: which_python
+
+    - set_fact:
+        ansible_python_interpreter: "{{ which_python.stdout }}"
+
+
+    - name: create an address object
+      panos_object:
+        ip_address: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        operation: add
+        address: "{{ lookup('dig', newhost) }}"
+        address_type: ip-netmask
+        addressobject: "{{ newhost }}"
