@@ -36,11 +36,6 @@
       set_fact:
         curr_addrlist: "{{ addrgroup_details.object_details.entry.static.member }}"
 
-    - debug: var=addrlist
-
-    - name: get a list of hosts to delete from the address group
-      set_fact:
-        remove_addrlist: "{{ curr_addrlist | difference(addrlist) }}"
 
     - name: get a list of hosts to add to the address group
       set_fact:
