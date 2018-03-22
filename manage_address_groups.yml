@@ -7,6 +7,12 @@
   # thing to do. IT IS OPTIONAL but helpful for the demonstration
   pre_tasks:
     - include_tasks: preflight_checks.yml
+    - assert:
+        that: addrgroup is defined
+        msg: "'addrgroup' must be defined. it is the name of the address group"
+    - assert:
+        that: addrlist is defined
+        msg: "'addrlist' must be defined. it is the definitive list of hosts in the address group"
   tasks:
     - name: create address object if it does not exist
       panos_object:
@@ -16,3 +22,48 @@
         operation: add
         addressgroup: "{{ addrgroup }}"
         static_value: []
+
+    - name: get all the details from the address group
+      panos_object:
+        ip_address: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        operation: find
+        addressgroup: "{{ addrgroup }}"
+      register: addrgroup_details
+
+    - name: list of hosts assigned to the address group
+      set_fact:
+        curr_addrlist: "{{ addrgroup_details.object_details.entry.static.member }}"
+
+    - debug: var=addrlist
+
+    - name: get a list of hosts to delete from the address group
+      set_fact:
+        remove_addrlist: "{{ curr_addrlist | difference(addrlist) }}"
+
+    - name: get a list of hosts to add to the address group
+      set_fact:
+        create_addrlist: "{{ addrlist | difference(curr_addrlist) }}"
+
+
+    - name: create new address objects
+      panos_object:
+        ip_address: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        operation: add
+        address: "{{ lookup('dig', item) }}"
+        address_type: ip-netmask
+        addressobject: "{{ item }}"
+      with_items: "{{ create_addrlist }}"
+
+
+    - name: update address group members
+      panos_object:
+        ip_address: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        operation: update
+        addressgroup: "{{ addrgroup }}"
+        static_value: "{{ addrlist }}"
