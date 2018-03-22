@@ -278,9 +278,24 @@ def add_object(device, dev_group, new_object):
         dev_group.add(new_object)
     else:
         device.add(new_object)
-    new_object.create()
-    return True
 
+    new_object.create()
+    return None
+
+
+def check_object_idempotency(curr_object, new_object):
+    _changed = False
+    attrlist = ['static_value']
+    for _attrname in attrlist:
+        if hasattr(curr_object, _attrname):
+            if isinstance(getattr(curr_object, _attrname), list):
+                missing_entries = set(getattr(new_object,
+                                              _attrname)).difference(
+                                                  set(getattr(curr_object,
+                                                              _attrname)))
+                if len(missing_entries) > 0:
+                    _changed = True
+    return _changed
 
 def main():
     argument_spec = dict(
@@ -455,11 +470,16 @@ def main():
                     tag_name=tag_name,
                     color=color
                 )
-                changed = add_object(device, dev_group, new_object)
+                changed = check_object_idempotency(match, new_object)
+                if changed:
+                    add_object(device, dev_group, new_object)
+                    _msg = "Object '%s' successfully updated" % obj_name
+                else:
+                    _msg = "Object '%s' already updated" % obj_name
             except PanXapiError:
                 exc = get_exception()
                 module.fail_json(msg=exc.message)
-            module.exit_json(changed=changed, msg='Object \'%s\' successfully updated.' % obj_name)
+            module.exit_json(changed=changed, msg=_msg)
         else:
             module.fail_json(msg='Object \'%s\' does not exist. Use operation: \'add\' to add it.' % obj_name)
 
