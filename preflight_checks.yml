@@ -6,12 +6,21 @@
   rescue:
     - fail: msg="pip is not installed. Run easy_install pip or install PIP via your Linux or Homebrew(MacOS) installer"
 
-- name: PREFLIGHT - checks that dnspytho and pandevice python libraries are installed. Uses PIP
-  pip:
-    name: "{{ item }}"
-  with_items:
-    - dnspython
-    - pandevice
+- name: PREFLIGHT - checks that dnspython package is installed
+  block:
+    - name: PREFLIGHT - check that dnspython package is installed
+      shell: python -c "import dns.resolver"
+      changed_when: false
+  rescue:
+    - fail: msg="dnspython is not installed. run pip install dnspython to install or use your system package manager to install it"
+
+- name: PREFLIGHT - checks that pandevice is installed
+  block:
+    - name: PREFLIGHT - checks that pandevice python lib is installed
+      shell: python -c "import pan.xapi"
+      changed_when: false
+  rescue:
+    - fail: msg="install pandevice python lib. run 'pip install pandevice'"
 
 - name: |
     PREFLIGHT - if using virtualenv setting the correct python interpreter path is
