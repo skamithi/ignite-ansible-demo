@@ -1,8 +1,8 @@
 # ignite-ansible-demo
-Palo Alto Address Object Management Using Ansible
 
 
-This Git repository provides a demo of Palo Alto Address Object Management using Ansible.
+This Git repository provides a demo of Palo Alto Address Object Management using Ansible.  The presentation associated with this demo is titled
+"Firewall Automation Basics and Best Practises" and was presented in May 2018.
 
 
 ## Prerequisites
