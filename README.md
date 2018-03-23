@@ -57,3 +57,13 @@ ansible-playbook manage_address_groups.yml -e '{
     "addrgroup": "ldapservers"
     }'
 ```
+
+The ``panos_object`` Ansible module has been modified to add the necessary functionality to make this demonstration work.
+The ``addrlist`` is authoritative. So if a hostname is not listed in the ``addrlist`` but is present in the address group on the firewall,
+that host will be removed from the static value host list on the firewall. The  ``panos_object`` as of Ansible 2.4 is additive. It only
+adds new entries and is not able to delete existing addresses from an address group.
+
+## LICENSE
+MIT
+
+
