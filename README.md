@@ -59,7 +59,10 @@ ansible-playbook manage_address_groups.yml -e '{
 ```
 
 The ``panos_object`` Ansible module has been modified to add the necessary functionality to make this demonstration work.
-The ``addrlist`` is authoritative. So if a hostname is not listed in the ``addrlist`` but is present in the address group on the firewall,
+The ``addrlist`` variable is authoritative due the changes made to ``panos_object`` module. The modified ``panos_object`` module
+is found in the ``library/`` folder.
+
+If a hostname is not listed in the ``addrlist`` but is present in the address group on the firewall,
 that host will be removed from the static value host list on the firewall. The  ``panos_object`` as of Ansible 2.4 is additive. It only
 adds new entries and is not able to delete existing addresses from an address group.
 
