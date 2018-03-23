@@ -1,0 +1,6 @@
+all:
+  hosts:
+    panos-fw01:
+      ansible_user: admin
+      ansible_host: 192.168.1.1
+      ansible_password: AdminMightyP@assW0rd
