@@ -279,8 +279,6 @@ def add_object(device, dev_group, new_object):
         device.add(new_object)
 
     new_object.create()
-    return None
-
 
 
 def update_object(device, dev_group, new_object, curr_object):
@@ -448,11 +446,11 @@ def main():
                     _msg = "Object \'%s\' was not created"  % obj_name
                     module.fail_json(msg=_msg)
                 else:
-                    changed = add_object(device, dev_group, new_object)
+                    add_object(device, dev_group, new_object)
+                    module.exit_json(changed=True, msg='Object \'%s\' successfully added' % obj_name)
             except PanXapiError:
                 exc = get_exception()
                 module.fail_json(msg=exc.message)
-        module.exit_json(changed=changed, msg='Object \'%s\' successfully added' % obj_name)
     elif operation == "update":
         # Search for the object. Update if found.
         match = find_object(device, dev_group, obj_name, obj_type)
@@ -480,10 +478,10 @@ def main():
                     _msg = "Object '%s' successfully updated" % obj_name
                 else:
                     _msg = "Object '%s' already updated" % obj_name
+                module.exit_json(changed=changed, msg=_msg)
             except PanXapiError:
                 exc = get_exception()
                 module.fail_json(msg=exc.message)
-            module.exit_json(changed=changed, msg=_msg)
         else:
             module.fail_json(msg='Object \'%s\' does not exist. Use operation: \'add\' to add it.' % obj_name)
 
